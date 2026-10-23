@@ -179,6 +179,29 @@ function showFood(food) {
     } else restaurantLink.hidden = true;
     syncFavoriteButtons(root);
   }
+
+function categories(list, route) {
+    const box = find('[data-categories]');
+    const names = [...new Set(list.map((food) => food.category).filter(Boolean))];
+    if (route.category && !names.includes(route.category)) names.push(route.category);
+    for (const label of [
+      'Todas',
+      ...names.sort((a, b) => a.localeCompare(b, 'pt-BR')),
+    ]) {
+      const link = document.createElement('a');
+      const params = new URLSearchParams();
+      if (route.query) params.set('q', route.query);
+      if (label !== 'Todas') params.set('categoria', label);
+      link.href = `/foods${params.size ? `?${params}` : ''}`;
+      link.dataset.route = '';
+      link.textContent = label;
+      const active = label === (route.category || 'Todas');
+      link.className = active ? 'active' : '';
+      if (active) link.setAttribute('aria-current', 'page');
+      box.append(link);
+    }
+    find('[data-category-value]').value = route.category;
+  }
 async function render() {
     requestController?.abort(); requestController = new AbortController();
     const { signal } = requestController;
@@ -203,9 +226,9 @@ async function render() {
         status(foodList.length ? '' : 'Nenhum item disponível.');
       } else if (['foods', 'restaurants', 'users'].includes(route.name)) {
         const list = await load(route.name); if (signal.aborted || disposed) return;
-        let filtered = list;
+        let filtered = list.filter(item => normalize(`${item.name} ${item.category}`).includes(normalize(route.query)));
         if (route.name === 'foods') {
-          
+          categories(list, route); filtered = filtered.filter(food => !route.category || normalize(food.category) === normalize(route.category));
           renderFoods(root, find('[data-food-grid]'), filtered, items);
         } else if (route.name === 'restaurants') renderRestaurants(root, find('[data-restaurant-grid]'), filtered, items);
         else renderUsers(root, find('[data-user-grid]'), filtered);
@@ -253,9 +276,20 @@ function onClick(event) {
       toast(error.message);
     }
   }
+function onSubmit(event) {
+    if (!event.target.matches('[data-search]')) return;
+    event.preventDefault();
+    const form = event.target;
+    const data = new FormData(form);
+    const params = new URLSearchParams();
+    const query = String(data.get('q') || '').trim();
+    if (query) params.set('q', query);
+    if (data.get('categoria')) params.set('categoria', data.get('categoria'));
+    navigate(`/${form.dataset.search}${params.size ? `?${params}` : ''}`);
+  }
 
 root.addEventListener('click', onClick, eventOptions);
-
+root.addEventListener('submit', onSubmit, eventOptions);
 window.addEventListener('popstate', render, eventOptions);
 
 render();
