@@ -1,7 +1,12 @@
+/*
+  Cria cards a partir dos templates locais de Layout.html.
+  Dados externos entram por textContent e URLs validadas, nunca como HTML.
+  Mantém o visual compartilhado entre início, listas, detalhes e favoritos.
+ */
 import { getFavorites } from '../utils/storage.js';
-
 import { money, excerpt, safeImage } from '../utils/format.js';
 
+// Preenche uma foto ou a substitui por uma imagem local em caso de falha.
 export function setImage(image, value, label, fallback = '/images/marmita.jpg') {
   image.alt = label;
   const url = safeImage(value);
@@ -14,6 +19,7 @@ export function setImage(image, value, label, fallback = '/images/marmita.jpg') 
   };
 }
 
+// Sincroniza cada coração com a lista persistida no navegador.
 export function syncFavoriteButtons(root) {
   const saved = new Set(getFavorites().map((item) => `${item.resource}:${item.id}`));
   root.querySelectorAll('[data-favorite]').forEach((button) => {
@@ -28,6 +34,7 @@ export function syncFavoriteButtons(root) {
   });
 }
 
+// Retorna a taxa apenas quando esse valor existe nos dados.
 export function deliveryLabel(restaurant) {
   return restaurant.deliveryFee === 0
     ? 'Entrega grátis'
@@ -36,6 +43,7 @@ export function deliveryLabel(restaurant) {
       : 'Consulte a entrega';
 }
 
+// Clona e preenche os cards de alimentos, registrando ações por ID.
 export function renderFoods(root, grid, foods, items) {
   grid.replaceChildren();
   foods.forEach((food) => {
@@ -61,6 +69,7 @@ export function renderFoods(root, grid, foods, items) {
   syncFavoriteButtons(root);
 }
 
+// Clona cards de restaurantes com avaliação e prazo somente se disponíveis.
 export function renderRestaurants(root, grid, restaurants, items) {
   grid.replaceChildren();
   restaurants.forEach((restaurant) => {
@@ -89,6 +98,7 @@ export function renderRestaurants(root, grid, restaurants, items) {
   syncFavoriteButtons(root);
 }
 
+// Mostra a lista de perfis da API sem transformar e-mails em HTML.
 export function renderUsers(root, grid, users) {
   grid.replaceChildren();
   users.forEach((user) => {

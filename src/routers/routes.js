@@ -5,7 +5,7 @@
  */
 
 // Converte a localização atual em uma descrição de tela para o controller.
-function resolveOriginalRoute(location) {
+export function resolveRoute(location) {
   const path = location.pathname.replace(/\/+$/, '') || '/';
   const params = new URLSearchParams(location.search);
   const query = (params.get('q') || '').trim().slice(0, 120);
@@ -29,9 +29,4 @@ function resolveOriginalRoute(location) {
     };
   }
   return { name: 'notFound' };
-}
-
-export function resolveRoute(location) {
-  const route = resolveOriginalRoute(location);
-  return ["home","notFound","foods","restaurants","restaurantDetails","users","userDetails","foodDetails","favorites","cart"].includes(route.name) ? route : { name: 'notFound' };
 }

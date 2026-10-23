@@ -1,21 +1,51 @@
+/*
+  Coordena as rotas, os dados e os eventos da aplicação.
+  render escolhe um HTML de pages e consulta as rotas correspondentes da API.
+  cardsController preenche listas; storage cuida da sacola e dos favoritos.
+  A limpeza cancela consultas e eventos ao desmontar o React.
+ */
 import home from '../pages/Home.html?raw';
-import notFound from '../pages/NotFound.html?raw';
 import foods from '../pages/Foods.html?raw';
+import foodDetails from '../pages/FoodDetails.html?raw';
 import restaurants from '../pages/Restaurants.html?raw';
 import restaurantDetails from '../pages/RestaurantDetails.html?raw';
 import users from '../pages/Users.html?raw';
 import userDetails from '../pages/UserDetails.html?raw';
-import foodDetails from '../pages/FoodDetails.html?raw';
 import favorites from '../pages/Favorites.html?raw';
 import cart from '../pages/Cart.html?raw';
+import notFound from '../pages/NotFound.html?raw';
 import { resolveRoute } from '../routers/routes.js';
-import { getCart } from '../utils/storage.js';
 import { getResource, clearApiCache } from '../utils/api.js';
 import { money, normalize } from '../utils/format.js';
-import { setImage, syncFavoriteButtons, deliveryLabel, renderFoods, renderRestaurants, renderUsers } from './cardsController.js';
-import { getFavorites, toggleFavorite } from '../utils/storage.js';
-import { addToCart, changeQuantity } from '../utils/storage.js';
-const pages = { home, notFound, foods, restaurants, restaurantDetails, users, userDetails, foodDetails, favorites, cart };
+import {
+  getCart,
+  addToCart,
+  changeQuantity,
+  clearCart,
+  getFavorites,
+  toggleFavorite,
+} from '../utils/storage.js';
+import {
+  setImage,
+  renderFoods,
+  renderRestaurants,
+  renderUsers,
+  syncFavoriteButtons,
+  deliveryLabel,
+} from './cardsController.js';
+
+const pages = {
+  home,
+  foods,
+  foodDetails,
+  restaurants,
+  restaurantDetails,
+  users,
+  userDetails,
+  favorites,
+  cart,
+  notFound,
+};
 const titles = {
   home: 'Sabor que chega até você',
   foods: 'Descubra comidas',
@@ -28,6 +58,8 @@ const titles = {
   userDetails: 'Perfil',
   notFound: 'Página não encontrada',
 };
+
+// Inicia o aplicativo e retorna a função que encerra sua montagem.
 export function mountApplication(root) {
   const main = root.querySelector('#main');
   const items = new Map();
@@ -48,7 +80,8 @@ export function mountApplication(root) {
     main.focus({ preventScroll: true });
   }
 
-function toast(message) {
+  // Exibe uma confirmação breve sem interromper a navegação.
+  function toast(message) {
     const box = root.querySelector('[data-toast]');
     box.textContent = message;
     box.hidden = false;
@@ -58,7 +91,8 @@ function toast(message) {
     }, 3500);
   }
 
-function updateNavigation() {
+  // Atualiza o contador da sacola e o item ativo dos menus.
+  function updateNavigation() {
     const route = resolveRoute(location);
     const active =
       route.name === 'home'
@@ -84,7 +118,8 @@ function updateNavigation() {
       .forEach((label) => (label.textContent = count));
   }
 
-function status(message, retry = false) {
+  // Preenche carregamento, erro e estados vazios sem inserir conteúdo externo em HTML.
+  function status(message, retry = false) {
     const box = find('[data-status]');
     if (!box) return;
     box.replaceChildren();
@@ -103,13 +138,74 @@ function status(message, retry = false) {
     }
   }
 
-function showSource(results) {
+  // Mostra a origem real dos dados; nunca apresenta os exemplos como resposta da API.
+  function showSource(results) {
     const usedDemo = results.some((result) => result.source === 'demo');
     const banner = root.querySelector('[data-demo-banner]');
     banner.hidden = !usedDemo;
   }
 
-function showRestaurant(restaurant, allFoods) {
+  // Atualiza saudação e endereço quando um perfil está disponível.
+  function greet(user) {
+    const firstName = user.name.split(' ')[0];
+    root.querySelector('[data-greeting]').textContent = `Olá, ${firstName}`;
+    root.querySelector('[data-avatar]').textContent = firstName.slice(0, 1);
+    root.querySelector('[data-location]').textContent =
+      user.address || 'Endereço não informado';
+    if (find('[data-welcome]')) {
+      find('[data-welcome]').textContent = `O que vamos comer hoje, ${firstName}?`;
+    }
+  }
+
+  // Cria categorias a partir do conteúdo carregado, sem descartar a categoria da URL.
+  function categories(list, route) {
+    const box = find('[data-categories]');
+    const names = [...new Set(list.map((food) => food.category).filter(Boolean))];
+    if (route.category && !names.includes(route.category)) names.push(route.category);
+    for (const label of [
+      'Todas',
+      ...names.sort((a, b) => a.localeCompare(b, 'pt-BR')),
+    ]) {
+      const link = document.createElement('a');
+      const params = new URLSearchParams();
+      if (route.query) params.set('q', route.query);
+      if (label !== 'Todas') params.set('categoria', label);
+      link.href = `/foods${params.size ? `?${params}` : ''}`;
+      link.dataset.route = '';
+      link.textContent = label;
+      const active = label === (route.category || 'Todas');
+      link.className = active ? 'active' : '';
+      if (active) link.setAttribute('aria-current', 'page');
+      box.append(link);
+    }
+    find('[data-category-value]').value = route.category;
+  }
+
+  // Preenche o detalhe da comida e prepara quantidade, favorito e sacola.
+  function showFood(food) {
+    detailFood = food;
+    detailCount = 1;
+    items.set(`foods:${food.id}`, food);
+    find('[data-detail]').hidden = false;
+    document.title = `${food.name} | JChef`;
+    setImage(find('[data-food-image]'), food.image, food.name);
+    find('[data-food-name]').textContent = food.name;
+    find('[data-food-category]').textContent = food.category || 'Feito para sua fome';
+    find('[data-food-description]').textContent =
+      food.description || 'Descrição não informada pelo restaurante.';
+    find('[data-food-price]').textContent = money(food.price);
+    find('[data-favorite]').dataset.favorite = `foods:${food.id}`;
+    find('[data-add-detail]').disabled = !Number.isFinite(food.price);
+    const restaurantLink = find('[data-food-restaurant]');
+    if (food.restaurantId) {
+      restaurantLink.href = `/restaurants/${food.restaurantId}`;
+      restaurantLink.textContent = `${food.restaurantName || 'Ver restaurante'} ↗`;
+    } else restaurantLink.hidden = true;
+    syncFavoriteButtons(root);
+  }
+
+  // Preenche restaurante e relaciona comidas somente quando há ID de vínculo.
+  function showRestaurant(restaurant, allFoods) {
     items.set(`restaurants:${restaurant.id}`, restaurant);
     find('[data-detail]').hidden = false;
     document.title = `${restaurant.name} | JChef`;
@@ -141,18 +237,8 @@ function showRestaurant(restaurant, allFoods) {
     syncFavoriteButtons(root);
   }
 
-function greet(user) {
-    const firstName = user.name.split(' ')[0];
-    root.querySelector('[data-greeting]').textContent = `Olá, ${firstName}`;
-    root.querySelector('[data-avatar]').textContent = firstName.slice(0, 1);
-    root.querySelector('[data-location]').textContent =
-      user.address || 'Endereço não informado';
-    if (find('[data-welcome]')) {
-      find('[data-welcome]').textContent = `O que vamos comer hoje, ${firstName}?`;
-    }
-  }
-
-function showUser(user) {
+  // Preenche os dados do perfil sem alterar a conta remota.
+  function showUser(user) {
     find('[data-detail]').hidden = false;
     document.title = `${user.name} | JChef`;
     find('[data-user-name]').textContent = user.name;
@@ -162,52 +248,8 @@ function showUser(user) {
     }
   }
 
-function showFood(food) {
-    detailFood = food;
-    detailCount = 1;
-    items.set(`foods:${food.id}`, food);
-    find('[data-detail]').hidden = false;
-    document.title = `${food.name} | JChef`;
-    setImage(find('[data-food-image]'), food.image, food.name);
-    find('[data-food-name]').textContent = food.name;
-    find('[data-food-category]').textContent = food.category || 'Feito para sua fome';
-    find('[data-food-description]').textContent =
-      food.description || 'Descrição não informada pelo restaurante.';
-    find('[data-food-price]').textContent = money(food.price);
-    find('[data-favorite]').dataset.favorite = `foods:${food.id}`;
-    find('[data-add-detail]').disabled = !Number.isFinite(food.price);
-    const restaurantLink = find('[data-food-restaurant]');
-    if (food.restaurantId) {
-      restaurantLink.href = `/restaurants/${food.restaurantId}`;
-      restaurantLink.textContent = `${food.restaurantName || 'Ver restaurante'} ↗`;
-    } else restaurantLink.hidden = true;
-    syncFavoriteButtons(root);
-  }
-
-function categories(list, route) {
-    const box = find('[data-categories]');
-    const names = [...new Set(list.map((food) => food.category).filter(Boolean))];
-    if (route.category && !names.includes(route.category)) names.push(route.category);
-    for (const label of [
-      'Todas',
-      ...names.sort((a, b) => a.localeCompare(b, 'pt-BR')),
-    ]) {
-      const link = document.createElement('a');
-      const params = new URLSearchParams();
-      if (route.query) params.set('q', route.query);
-      if (label !== 'Todas') params.set('categoria', label);
-      link.href = `/foods${params.size ? `?${params}` : ''}`;
-      link.dataset.route = '';
-      link.textContent = label;
-      const active = label === (route.category || 'Todas');
-      link.className = active ? 'active' : '';
-      if (active) link.setAttribute('aria-current', 'page');
-      box.append(link);
-    }
-    find('[data-category-value]').value = route.category;
-  }
-
-function showCart() {
+  // Mostra itens, quantidades e subtotal, deixando clara a ausência de frete calculado.
+  function showCart() {
     const saved = getCart();
     showSource(saved);
     if (!saved.length) {
@@ -244,15 +286,25 @@ function showCart() {
       saved.reduce((sum, food) => sum + food.price * food.quantity, 0),
     );
   }
-async function render() {
-    requestController?.abort(); requestController = new AbortController();
+
+  // Cancela a tela anterior e carrega exatamente os recursos da rota selecionada.
+  async function render() {
+    requestController?.abort();
+    requestController = new AbortController();
     const { signal } = requestController;
     const route = resolveRoute(location);
-    main.innerHTML = pages[route.name]; items.clear(); detailFood = null;
-    updateNavigation(); document.title = titles[route.name] + ' | JChef';
-    const searchInput = find('input[name="q"]'); if (searchInput) searchInput.value = route.query || '';
+    main.innerHTML = pages[route.name];
+    items.clear();
+    detailFood = null;
+    updateNavigation();
+    document.title = `${titles[route.name]} | JChef`;
+    const searchInput = find('input[name="q"]');
+    if (searchInput) searchInput.value = route.query || '';
     if (route.name === 'notFound') return;
-    if (route.name === 'cart') { showCart(); return; }
+    if (route.name === 'cart') {
+      showCart();
+      return;
+    }
     if (route.name === 'favorites') {
       const saved = getFavorites();
       showSource(saved);
@@ -268,39 +320,76 @@ async function render() {
         );
       return;
     }
-    status('Carregando dados...');
+    status('Preparando algo gostoso para você…');
     try {
       const results = [];
-      const load = async (resource, id) => { const result = await getResource(resource, id, signal); results.push(result); return result.data; };
+      const load = async (resource, id) => {
+        const result = await getResource(resource, id, signal);
+        results.push(result);
+        return result.data;
+      };
       if (route.name === 'home') {
-        const foodList = await load('foods');
-        const restaurantList = await load('restaurants');
-        const userList = await load('users'); if (userList[0]) greet(userList[0]);
+        const [foodList, restaurantList, userList] = await Promise.all([
+          load('foods'),
+          load('restaurants'),
+          load('users'),
+        ]);
         if (signal.aborted || disposed) return;
+        if (userList[0]) greet(userList[0]);
         renderFoods(root, find('[data-food-grid]'), foodList.slice(0, 4), items);
-        renderRestaurants(root, find('[data-restaurant-grid]'), restaurantList.slice(0, 4), items);
-        status(foodList.length ? '' : 'Nenhum item disponível.');
+        renderRestaurants(
+          root,
+          find('[data-restaurant-grid]'),
+          restaurantList.slice(0, 4),
+          items,
+        );
+        status(
+          foodList.length || restaurantList.length
+            ? ''
+            : 'Nenhum item disponível no momento.',
+        );
       } else if (['foods', 'restaurants', 'users'].includes(route.name)) {
-        const list = await load(route.name); if (signal.aborted || disposed) return;
-        let filtered = list.filter(item => normalize(`${item.name} ${item.category}`).includes(normalize(route.query)));
+        const list = await load(route.name);
+        if (signal.aborted || disposed) return;
+        let filtered = list.filter((item) =>
+          normalize(`${item.name} ${item.category}`).includes(normalize(route.query)),
+        );
         if (route.name === 'foods') {
-          categories(list, route); filtered = filtered.filter(food => !route.category || normalize(food.category) === normalize(route.category));
+          categories(list, route);
+          filtered = filtered.filter(
+            (food) =>
+              !route.category || normalize(food.category) === normalize(route.category),
+          );
           renderFoods(root, find('[data-food-grid]'), filtered, items);
-        } else if (route.name === 'restaurants') renderRestaurants(root, find('[data-restaurant-grid]'), filtered, items);
-        else renderUsers(root, find('[data-user-grid]'), filtered);
-        find('[data-result-count]').textContent = filtered.length + ' resultados encontrados';
-        status(filtered.length ? '' : 'Nenhum resultado encontrado.');
+        } else if (route.name === 'restaurants') {
+          renderRestaurants(root, find('[data-restaurant-grid]'), filtered, items);
+        } else renderUsers(root, find('[data-user-grid]'), filtered);
+        find('[data-result-count]').textContent =
+          `${filtered.length} ${filtered.length === 1 ? 'resultado encontrado' : 'resultados encontrados'}`;
+        status(
+          filtered.length
+            ? ''
+            : 'Nenhum resultado encontrado. Tente outro nome ou categoria.',
+        );
       } else {
-        const record = await load(route.resource, route.id); if (signal.aborted || disposed) return;
-        if (route.name === 'restaurantDetails') { const foodList = await load('foods'); if (signal.aborted || disposed) return; showRestaurant(record, foodList); }
-        else if (route.name === 'userDetails') showUser(record);
-        else if (route.name === 'foodDetails') showFood(record);
+        const record = await load(route.resource, route.id);
+        if (signal.aborted || disposed) return;
+        if (route.name === 'restaurantDetails') {
+          const foodList = await load('foods');
+          if (signal.aborted || disposed) return;
+          showRestaurant(record, foodList);
+        } else if (route.name === 'foodDetails') showFood(record);
+        else showUser(record);
         status('');
       }
       if (!signal.aborted && !disposed) showSource(results);
-    } catch (error) { if (!signal.aborted && !disposed) status(error.message, true); }
+    } catch (error) {
+      if (!signal.aborted && !disposed) status(error.message, true);
+    }
   }
-function onClick(event) {
+
+  // Trata links internos e ações locais com um único listener de cliques.
+  function onClick(event) {
     const target = event.target;
     const link = target.closest('a[data-route]');
     if (
@@ -347,12 +436,24 @@ function onClick(event) {
         toast(
           `${detailCount} ${detailCount === 1 ? 'item adicionado' : 'itens adicionados'} à sacola.`,
         );
+      } else if (button.hasAttribute('data-confirm-open')) {
+        find('[data-checkout-dialog]').showModal();
+      } else if (button.hasAttribute('data-confirm-order')) {
+        clearCart();
+        find('[data-checkout-dialog]').close();
+        render();
+        status(
+          'Simulação concluída! Nenhum pedido foi enviado. Sua sacola foi esvaziada.',
+        );
+        updateNavigation();
       }
     } catch (error) {
       toast(error.message);
     }
   }
-function onSubmit(event) {
+
+  // Gera uma URL compartilhável para a busca, preservando a categoria da comida.
+  function onSubmit(event) {
     if (!event.target.matches('[data-search]')) return;
     event.preventDefault();
     const form = event.target;
@@ -364,10 +465,23 @@ function onSubmit(event) {
     navigate(`/${form.dataset.search}${params.size ? `?${params}` : ''}`);
   }
 
-root.addEventListener('click', onClick, eventOptions);
-root.addEventListener('submit', onSubmit, eventOptions);
-window.addEventListener('popstate', render, eventOptions);
-window.addEventListener('storage', event => { if (!event.key || event.key.startsWith('jchef:')) render(); }, eventOptions);
-render();
-return () => { disposed = true; requestController?.abort(); events.abort(); clearTimeout(toastTimer); };
+  root.addEventListener('click', onClick, eventOptions);
+  root.addEventListener('submit', onSubmit, eventOptions);
+  window.addEventListener('popstate', render, eventOptions);
+  window.addEventListener(
+    'storage',
+    (event) => {
+      if (!event.key || event.key.startsWith('jchef:')) render();
+    },
+    eventOptions,
+  );
+  render();
+
+  // Encerra consultas, eventos e notificações desta montagem do React.
+  return () => {
+    disposed = true;
+    requestController?.abort();
+    events.abort();
+    clearTimeout(toastTimer);
+  };
 }
