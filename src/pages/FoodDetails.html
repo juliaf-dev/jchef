@@ -1,0 +1,85 @@
+<!-- Detalhe vinculado a GET /foods/:id. Ações usam favoritos e sacola locais. -->
+<a
+  class="back-link"
+  href="/foods"
+  data-route
+>
+  ‹ Voltar às comidas
+</a>
+<div
+  data-status
+  role="status"
+  aria-live="polite"
+></div>
+<article
+  class="food-detail"
+  data-detail
+  hidden
+>
+  <div class="detail-photo">
+    <img
+      alt=""
+      data-food-image
+    />
+    <button hidden disabled
+      class="favorite-button"
+      type="button"
+      data-favorite
+      aria-pressed="false"
+    >
+      ♡
+    </button>
+  </div>
+  <div class="food-detail-info">
+    <p
+      class="eyebrow"
+      data-food-category
+    ></p>
+    <h1 data-food-name></h1>
+    <p
+      class="detail-description"
+      data-food-description
+    ></p>
+    <a
+      class="restaurant-link"
+      data-food-restaurant
+      data-route
+    ></a>
+    <strong
+      class="detail-price"
+      data-food-price
+    ></strong>
+    <div class="food-detail-actions">
+      <div class="quantity-control">
+        <button
+          type="button"
+          data-detail-quantity="-1"
+          aria-label="Diminuir quantidade"
+        >
+          −
+        </button>
+        <output
+          data-detail-count
+          aria-label="Quantidade"
+        >
+          1
+        </output>
+        <button
+          type="button"
+          data-detail-quantity="1"
+          aria-label="Aumentar quantidade"
+        >
+          +
+        </button>
+      </div>
+      <button hidden disabled
+        class="btn btn-danger"
+        type="button"
+        data-add-detail
+      >
+        Adicionar à sacola
+      </button>
+    </div>
+    <p class="muted small">Pedido demonstrativo. Nenhuma cobrança é realizada.</p>
+  </div>
+</article>

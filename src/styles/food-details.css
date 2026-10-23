@@ -1,0 +1,72 @@
+/*
+  Estilos da página individual: food-details.
+  O controller preenche os dados; este arquivo cuida somente da apresentação.
+  O celular usa a base e min-width amplia o layout para telas maiores.
+ */
+
+.detail-photo {
+  position: relative;
+  aspect-ratio: 1.2;
+  border-radius: 16px;
+  overflow: hidden;
+  background: var(--soft);
+}
+.detail-photo > img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.detail-photo .favorite-button {
+  top: 15px;
+  right: 15px;
+  width: 42px;
+  height: 42px;
+  font-size: 28px;
+}
+.food-detail-info {
+  padding-top: 26px;
+}
+.food-detail h1 {
+  margin-bottom: 18px;
+}
+.detail-description {
+  color: #827886;
+  font-size: 14px;
+  line-height: 1.9;
+}
+.restaurant-link {
+  display: inline-block;
+  font-size: 12px;
+  color: var(--red);
+  margin: 6px 0 25px;
+}
+.detail-price {
+  display: block;
+  font-size: 27px;
+  color: var(--green);
+  margin-bottom: 25px;
+}
+.food-detail-actions {
+  display: flex;
+  align-items: stretch;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+.food-detail-actions > .btn {
+  flex: 1;
+}
+@media (min-width: 700px) {
+  .food-detail {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    align-items: center;
+    gap: 45px;
+  }
+  .food-detail-info {
+    padding: 12px 0;
+  }
+  .detail-photo {
+    aspect-ratio: 1;
+  }
+}

@@ -9,6 +9,7 @@ import './styles/global.css';
 import './styles/components.css';
 import './styles/home.css';
 import './styles/foods.css';
+import './styles/food-details.css';
 import './styles/restaurants.css';
 import './styles/restaurant-details.css';
 import './styles/users.css';

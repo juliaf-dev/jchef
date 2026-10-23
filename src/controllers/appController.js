@@ -5,12 +5,13 @@ import restaurants from '../pages/Restaurants.html?raw';
 import restaurantDetails from '../pages/RestaurantDetails.html?raw';
 import users from '../pages/Users.html?raw';
 import userDetails from '../pages/UserDetails.html?raw';
+import foodDetails from '../pages/FoodDetails.html?raw';
 import { resolveRoute } from '../routers/routes.js';
 import { getCart } from '../utils/storage.js';
 import { getResource, clearApiCache } from '../utils/api.js';
 import { money, normalize } from '../utils/format.js';
 import { setImage, syncFavoriteButtons, deliveryLabel, renderFoods, renderRestaurants, renderUsers } from './cardsController.js';
-const pages = { home, notFound, foods, restaurants, restaurantDetails, users, userDetails };
+const pages = { home, notFound, foods, restaurants, restaurantDetails, users, userDetails, foodDetails };
 const titles = {
   home: 'Sabor que chega até você',
   foods: 'Descubra comidas',
@@ -156,6 +157,28 @@ function showUser(user) {
       find(`[data-user-${field}]`).textContent = user[field] || 'Não informado';
     }
   }
+
+function showFood(food) {
+    detailFood = food;
+    detailCount = 1;
+    items.set(`foods:${food.id}`, food);
+    find('[data-detail]').hidden = false;
+    document.title = `${food.name} | JChef`;
+    setImage(find('[data-food-image]'), food.image, food.name);
+    find('[data-food-name]').textContent = food.name;
+    find('[data-food-category]').textContent = food.category || 'Feito para sua fome';
+    find('[data-food-description]').textContent =
+      food.description || 'Descrição não informada pelo restaurante.';
+    find('[data-food-price]').textContent = money(food.price);
+    find('[data-favorite]').dataset.favorite = `foods:${food.id}`;
+    find('[data-add-detail]').disabled = !Number.isFinite(food.price);
+    const restaurantLink = find('[data-food-restaurant]');
+    if (food.restaurantId) {
+      restaurantLink.href = `/restaurants/${food.restaurantId}`;
+      restaurantLink.textContent = `${food.restaurantName || 'Ver restaurante'} ↗`;
+    } else restaurantLink.hidden = true;
+    syncFavoriteButtons(root);
+  }
 async function render() {
     requestController?.abort(); requestController = new AbortController();
     const { signal } = requestController;
@@ -192,7 +215,7 @@ async function render() {
         const record = await load(route.resource, route.id); if (signal.aborted || disposed) return;
         if (route.name === 'restaurantDetails') { const foodList = await load('foods'); if (signal.aborted || disposed) return; showRestaurant(record, foodList); }
         else if (route.name === 'userDetails') showUser(record);
-        
+        else if (route.name === 'foodDetails') showFood(record);
         status('');
       }
       if (!signal.aborted && !disposed) showSource(results);
@@ -219,6 +242,12 @@ function onClick(event) {
       if (button.hasAttribute('data-retry-api')) {
         clearApiCache();
         render();
+      } else if (button.hasAttribute('data-detail-quantity')) {
+        detailCount = Math.max(
+          1,
+          Math.min(99, detailCount + Number(button.dataset.detailQuantity)),
+        );
+        find('[data-detail-count]').textContent = detailCount;
       }
     } catch (error) {
       toast(error.message);
