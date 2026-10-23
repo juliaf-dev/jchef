@@ -1,0 +1,51 @@
+<!-- Lista vinculada a GET /restaurants. Cada card abre seu ID na API. -->
+<a
+  class="back-link"
+  href="/"
+  data-route
+>
+  ‹ Voltar ao início
+</a>
+<div class="page-heading">
+  <p class="eyebrow">BOAS COZINHAS, BOAS HISTÓRIAS</p>
+  <h1>Restaurantes</h1>
+  <p>Encontre o lugar certo para a sua vontade.</p>
+</div>
+<form hidden
+  class="search-box page-search"
+  role="search"
+  data-search="restaurants"
+>
+  <button
+    type="submit"
+    aria-label="Buscar restaurantes"
+  >
+    ⌕
+  </button>
+  <label
+    class="visually-hidden"
+    for="restaurants-query"
+  >
+    Nome do restaurante
+  </label>
+  <input
+    id="restaurants-query"
+    name="q"
+    type="search"
+    placeholder="Buscar restaurantes ou especialidades"
+    maxlength="120"
+  />
+</form>
+<p
+  class="result-count"
+  data-result-count
+></p>
+<div
+  data-status
+  role="status"
+  aria-live="polite"
+></div>
+<div
+  class="restaurant-grid restaurant-list"
+  data-restaurant-grid
+></div>

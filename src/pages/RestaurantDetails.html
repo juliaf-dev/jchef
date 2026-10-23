@@ -1,0 +1,67 @@
+<!-- GET /restaurants/:id preenche o estabelecimento; GET /foods traz o cardápio. -->
+<a
+  class="back-link"
+  href="/restaurants"
+  data-route
+>
+  ‹ Voltar aos restaurantes
+</a>
+<div
+  data-status
+  role="status"
+  aria-live="polite"
+></div>
+<article
+  data-detail
+  hidden
+>
+  <div class="restaurant-cover">
+    <img
+      alt=""
+      data-restaurant-image
+    />
+    <button hidden disabled
+      class="favorite-button"
+      type="button"
+      data-favorite
+      aria-pressed="false"
+    >
+      ♡
+    </button>
+  </div>
+  <div class="restaurant-detail-heading">
+    <div>
+      <p
+        class="eyebrow"
+        data-restaurant-category
+      ></p>
+      <h1 data-restaurant-name></h1>
+      <p data-restaurant-description></p>
+    </div>
+    <div
+      class="restaurant-facts"
+      data-restaurant-facts
+    ></div>
+  </div>
+  <p
+    class="muted small"
+    data-restaurant-address
+  ></p>
+  <div class="section-heading">
+    <h2 data-menu-title>Cardápio</h2>
+    <a
+      href="/foods"
+      data-route
+    >
+      Ver todas as comidas ↗
+    </a>
+  </div>
+  <p
+    class="muted"
+    data-menu-note
+  ></p>
+  <div
+    class="food-grid"
+    data-food-grid
+  ></div>
+</article>

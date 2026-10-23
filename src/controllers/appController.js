@@ -1,12 +1,14 @@
 import home from '../pages/Home.html?raw';
 import notFound from '../pages/NotFound.html?raw';
 import foods from '../pages/Foods.html?raw';
+import restaurants from '../pages/Restaurants.html?raw';
+import restaurantDetails from '../pages/RestaurantDetails.html?raw';
 import { resolveRoute } from '../routers/routes.js';
 import { getCart } from '../utils/storage.js';
 import { getResource, clearApiCache } from '../utils/api.js';
 import { money, normalize } from '../utils/format.js';
-import { setImage, syncFavoriteButtons, deliveryLabel, renderFoods } from './cardsController.js';
-const pages = { home, notFound, foods };
+import { setImage, syncFavoriteButtons, deliveryLabel, renderFoods, renderRestaurants } from './cardsController.js';
+const pages = { home, notFound, foods, restaurants, restaurantDetails };
 const titles = {
   home: 'Sabor que chega até você',
   foods: 'Descubra comidas',
@@ -99,6 +101,38 @@ function showSource(results) {
     const banner = root.querySelector('[data-demo-banner]');
     banner.hidden = !usedDemo;
   }
+
+function showRestaurant(restaurant, allFoods) {
+    items.set(`restaurants:${restaurant.id}`, restaurant);
+    find('[data-detail]').hidden = false;
+    document.title = `${restaurant.name} | JChef`;
+    setImage(find('[data-restaurant-image]'), restaurant.image, restaurant.name);
+    find('[data-restaurant-name]').textContent = restaurant.name;
+    find('[data-restaurant-description]').textContent =
+      restaurant.description || 'Conheça os sabores deste restaurante.';
+    find('[data-restaurant-category]').textContent =
+      restaurant.category || 'Cozinha perto de você';
+    find('[data-restaurant-address]').textContent =
+      restaurant.address || 'Endereço não informado';
+    find('[data-restaurant-facts]').textContent = [
+      restaurant.rating === null ? '' : `★ ${restaurant.rating.toFixed(1)}`,
+      restaurant.deliveryTime,
+      deliveryLabel(restaurant),
+    ]
+      .filter(Boolean)
+      .join(' · ');
+    find('[data-favorite]').dataset.favorite = `restaurants:${restaurant.id}`;
+    const related = allFoods.filter(
+      (food) =>
+        food.restaurantId === restaurant.id && food.source === restaurant.source,
+    );
+    if (!related.length) {
+      find('[data-menu-note]').textContent =
+        'Nenhuma comida vinculada a este restaurante foi encontrada.';
+    }
+    renderFoods(root, find('[data-food-grid]'), related, items);
+    syncFavoriteButtons(root);
+  }
 async function render() {
     requestController?.abort(); requestController = new AbortController();
     const { signal } = requestController;
@@ -115,11 +149,11 @@ async function render() {
       const load = async (resource, id) => { const result = await getResource(resource, id, signal); results.push(result); return result.data; };
       if (route.name === 'home') {
         const foodList = await load('foods');
-        
+        const restaurantList = await load('restaurants');
         
         if (signal.aborted || disposed) return;
         renderFoods(root, find('[data-food-grid]'), foodList.slice(0, 4), items);
-        find('[data-restaurant-grid]').closest('section').hidden = true;
+        renderRestaurants(root, find('[data-restaurant-grid]'), restaurantList.slice(0, 4), items);
         status(foodList.length ? '' : 'Nenhum item disponível.');
       } else if (['foods', 'restaurants', 'users'].includes(route.name)) {
         const list = await load(route.name); if (signal.aborted || disposed) return;
@@ -127,13 +161,13 @@ async function render() {
         if (route.name === 'foods') {
           
           renderFoods(root, find('[data-food-grid]'), filtered, items);
-        } 
+        } else if (route.name === 'restaurants') renderRestaurants(root, find('[data-restaurant-grid]'), filtered, items);
         
         find('[data-result-count]').textContent = filtered.length + ' resultados encontrados';
         status(filtered.length ? '' : 'Nenhum resultado encontrado.');
       } else {
         const record = await load(route.resource, route.id); if (signal.aborted || disposed) return;
-        
+        if (route.name === 'restaurantDetails') { const foodList = await load('foods'); if (signal.aborted || disposed) return; showRestaurant(record, foodList); }
         
         
         status('');

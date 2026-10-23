@@ -9,6 +9,8 @@ import './styles/global.css';
 import './styles/components.css';
 import './styles/home.css';
 import './styles/foods.css';
+import './styles/restaurants.css';
+import './styles/restaurant-details.css';
 import './styles/not-found.css';
 import App from './App.jsx';
 

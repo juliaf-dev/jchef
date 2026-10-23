@@ -60,3 +60,31 @@ export function renderFoods(root, grid, foods, items) {
   });
   syncFavoriteButtons(root);
 }
+
+export function renderRestaurants(root, grid, restaurants, items) {
+  grid.replaceChildren();
+  restaurants.forEach((restaurant) => {
+    items.set(`restaurants:${restaurant.id}`, restaurant);
+    const card = root
+      .querySelector('#restaurant-card-template')
+      .content.cloneNode(true);
+    card
+      .querySelectorAll('a')
+      .forEach((link) => (link.href = `/restaurants/${restaurant.id}`));
+    card.querySelector('[data-name-link]').textContent = restaurant.name;
+    setImage(card.querySelector('img'), restaurant.image, restaurant.name);
+    card.querySelector('[data-favorite]').dataset.favorite =
+      `restaurants:${restaurant.id}`;
+    card.querySelector('.restaurant-meta').textContent = [
+      restaurant.category,
+      restaurant.deliveryTime,
+    ]
+      .filter(Boolean)
+      .join(' · ');
+    card.querySelector('.restaurant-rating').textContent =
+      `${restaurant.rating === null ? '' : `★ ${restaurant.rating.toFixed(1)} · `}` +
+      deliveryLabel(restaurant);
+    grid.append(card);
+  });
+  syncFavoriteButtons(root);
+}

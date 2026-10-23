@@ -1,0 +1,56 @@
+/*
+  Estilos da página individual: restaurant-details.
+  O controller preenche os dados; este arquivo cuida somente da apresentação.
+  O celular usa a base e min-width amplia o layout para telas maiores.
+ */
+
+.restaurant-cover {
+  position: relative;
+  height: 220px;
+  overflow: hidden;
+  border-radius: 16px;
+  background: var(--soft);
+}
+.restaurant-cover > img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.restaurant-cover .favorite-button {
+  top: 18px;
+  right: 18px;
+  width: 40px;
+  height: 40px;
+  font-size: 27px;
+}
+.restaurant-detail-heading {
+  padding-top: 26px;
+}
+.restaurant-detail-heading p:not(.eyebrow) {
+  max-width: 650px;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.8;
+}
+.restaurant-facts {
+  color: var(--green);
+  font-size: 12px;
+  margin: 16px 0;
+}
+[data-menu-title] {
+  margin-top: 24px;
+}
+@media (min-width: 700px) {
+  .restaurant-cover {
+    height: 310px;
+  }
+  .restaurant-detail-heading {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 30px;
+  }
+  .restaurant-facts {
+    white-space: nowrap;
+  }
+}
