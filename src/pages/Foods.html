@@ -1,0 +1,61 @@
+<!-- Lista vinculada a GET /foods. Busca e categorias filtram os dados carregados. -->
+<a
+  class="back-link"
+  href="/"
+  data-route
+>
+  ‹ Voltar ao início
+</a>
+<div class="page-heading">
+  <p class="eyebrow">SUA PRÓXIMA BOA ESCOLHA</p>
+  <h1>Descubra comidas</h1>
+  <p>Do primeiro desejo à última garfada.</p>
+</div>
+<form hidden
+  class="search-box page-search"
+  role="search"
+  data-search="foods"
+>
+  <button
+    type="submit"
+    aria-label="Buscar comidas"
+  >
+    ⌕
+  </button>
+  <label
+    class="visually-hidden"
+    for="foods-query"
+  >
+    Nome da comida
+  </label>
+  <input
+    id="foods-query"
+    name="q"
+    type="search"
+    placeholder="Busque pratos, lanches e muito mais"
+    maxlength="120"
+  />
+  <input
+    type="hidden"
+    name="categoria"
+    data-category-value
+  />
+</form>
+<nav
+  class="category-chips"
+  aria-label="Categorias de comidas"
+  data-categories
+></nav>
+<p
+  class="result-count"
+  data-result-count
+></p>
+<div
+  data-status
+  role="status"
+  aria-live="polite"
+></div>
+<div
+  class="food-grid"
+  data-food-grid
+></div>

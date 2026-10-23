@@ -1,0 +1,24 @@
+/*
+  Estilos da lista de foods, começando pelo celular.
+  Elementos compartilhados ficam em components.css e o detalhe em food-details.css.
+ */
+
+.category-chips {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding: 0 0 8px;
+}
+.category-chips a {
+  border: 1px solid var(--line);
+  border-radius: 30px;
+  padding: 8px 15px;
+  font-size: 11px;
+  white-space: nowrap;
+  color: #827886;
+}
+.category-chips a.active {
+  background: var(--red);
+  color: white;
+  border-color: var(--red);
+}

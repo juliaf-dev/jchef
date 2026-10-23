@@ -1,1 +1,170 @@
-<section><h1>Sabor que chega até você.</h1><p>Seu próximo favorito está por aqui.</p></section>
+<!-- Início: o controller busca usuários, comidas e restaurantes para cada seção. -->
+<section class="welcome-row">
+  <div>
+    <p class="eyebrow">O MELHOR DO SEU BAIRRO</p>
+    <h1 data-welcome>O que vamos comer hoje?</h1>
+    <p>Seus favoritos de sempre. Um novo sabor para descobrir.</p>
+  </div>
+  <span class="open-badge">
+    <i></i>
+    Feito para a sua fome
+  </span>
+</section>
+<form hidden
+  class="search-box home-search"
+  role="search"
+  data-search="foods"
+>
+  <label
+    class="visually-hidden"
+    for="home-query"
+  >
+    Buscar comidas
+  </label>
+  <button
+    type="submit"
+    aria-label="Buscar comidas"
+  >
+    ⌕
+  </button>
+  <input
+    id="home-query"
+    name="q"
+    type="search"
+    placeholder="O que vamos pedir hoje?"
+    maxlength="120"
+    required
+  />
+</form>
+<section
+  class="hero"
+  aria-labelledby="hero-title"
+>
+  <img
+    src="/images/burger.jpg"
+    alt="Hambúrguer artesanal com ingredientes frescos"
+  />
+  <div class="hero-content">
+    <p class="hero-tag">HOJE COMBINA COM</p>
+    <h2 id="hero-title">
+      Seu próximo favorito
+      <br />
+      está por aqui.
+    </h2>
+    <p>Uma pausa gostosa no seu dia. Aproveite!</p>
+    <a
+      class="btn btn-danger"
+      href="/foods?categoria=Lanches"
+      data-route
+    >
+      Explorar sabores
+      <span aria-hidden="true">↗</span>
+    </a>
+  </div>
+  <span class="hero-stamp">
+    FEITO COM
+    <br />
+    <strong>fome de viver.</strong>
+  </span>
+</section>
+<section
+  class="category-section"
+  aria-labelledby="categories-title"
+>
+  <div class="section-heading">
+    <h2 id="categories-title">O que dá vontade?</h2>
+    <a
+      href="/foods"
+      data-route
+    >
+      Ver tudo
+      <span aria-hidden="true">↗</span>
+    </a>
+  </div>
+  <div class="category-grid">
+    <a
+      href="/foods?categoria=Lanches"
+      data-route
+    >
+      <span aria-hidden="true">🍔</span>
+      Lanches
+    </a>
+    <a
+      href="/foods?categoria=Pizzas"
+      data-route
+    >
+      <span aria-hidden="true">🍕</span>
+      Pizzas
+    </a>
+    <a
+      href="/foods?categoria=Saudáveis"
+      data-route
+    >
+      <span aria-hidden="true">🥗</span>
+      Saudáveis
+    </a>
+    <a
+      href="/foods?categoria=Doces"
+      data-route
+    >
+      <span aria-hidden="true">🍨</span>
+      Doces
+    </a>
+    <a
+      href="/foods?categoria=Marmitas"
+      data-route
+    >
+      <span aria-hidden="true">🍱</span>
+      Marmitas
+    </a>
+  </div>
+</section>
+<div
+  data-status
+  role="status"
+  aria-live="polite"
+></div>
+<section
+  class="home-section"
+  aria-labelledby="recommended-title"
+>
+  <div class="section-heading">
+    <div>
+      <p class="eyebrow">ESCOLHIDOS PARA VOCÊ</p>
+      <h2 id="recommended-title">Comidas recomendadas</h2>
+    </div>
+    <a
+      href="/foods"
+      data-route
+    >
+      Descubra mais
+      <span aria-hidden="true">↗</span>
+    </a>
+  </div>
+  <div
+    class="food-grid"
+    data-food-grid
+  ></div>
+</section>
+<section
+  class="home-section"
+  aria-labelledby="nearby-title"
+>
+  <div class="section-heading">
+    <div>
+      <p class="eyebrow">SABOR A POUCOS CLIQUES</p>
+      <h2 id="nearby-title">Restaurantes perto de você</h2>
+    </div>
+    <a
+      href="/restaurants"
+      data-route
+    >
+      Ver restaurantes
+      <span aria-hidden="true">↗</span>
+    </a>
+  </div>
+  <div
+    class="restaurant-grid"
+    data-restaurant-grid
+  ></div>
+</section>

@@ -1,8 +1,12 @@
 import home from '../pages/Home.html?raw';
 import notFound from '../pages/NotFound.html?raw';
+import foods from '../pages/Foods.html?raw';
 import { resolveRoute } from '../routers/routes.js';
 import { getCart } from '../utils/storage.js';
-const pages = { home, notFound };
+import { getResource, clearApiCache } from '../utils/api.js';
+import { money, normalize } from '../utils/format.js';
+import { setImage, syncFavoriteButtons, deliveryLabel, renderFoods } from './cardsController.js';
+const pages = { home, notFound, foods };
 const titles = {
   home: 'Sabor que chega até você',
   foods: 'Descubra comidas',
@@ -96,10 +100,46 @@ function showSource(results) {
     banner.hidden = !usedDemo;
   }
 async function render() {
+    requestController?.abort(); requestController = new AbortController();
+    const { signal } = requestController;
     const route = resolveRoute(location);
-    main.innerHTML = pages[route.name];
-    updateNavigation();
-    document.title = titles[route.name] + ' | JChef';
+    main.innerHTML = pages[route.name]; items.clear(); detailFood = null;
+    updateNavigation(); document.title = titles[route.name] + ' | JChef';
+    const searchInput = find('input[name="q"]'); if (searchInput) searchInput.value = route.query || '';
+    if (route.name === 'notFound') return;
+    
+    
+    status('Carregando dados...');
+    try {
+      const results = [];
+      const load = async (resource, id) => { const result = await getResource(resource, id, signal); results.push(result); return result.data; };
+      if (route.name === 'home') {
+        const foodList = await load('foods');
+        
+        
+        if (signal.aborted || disposed) return;
+        renderFoods(root, find('[data-food-grid]'), foodList.slice(0, 4), items);
+        find('[data-restaurant-grid]').closest('section').hidden = true;
+        status(foodList.length ? '' : 'Nenhum item disponível.');
+      } else if (['foods', 'restaurants', 'users'].includes(route.name)) {
+        const list = await load(route.name); if (signal.aborted || disposed) return;
+        let filtered = list;
+        if (route.name === 'foods') {
+          
+          renderFoods(root, find('[data-food-grid]'), filtered, items);
+        } 
+        
+        find('[data-result-count]').textContent = filtered.length + ' resultados encontrados';
+        status(filtered.length ? '' : 'Nenhum resultado encontrado.');
+      } else {
+        const record = await load(route.resource, route.id); if (signal.aborted || disposed) return;
+        
+        
+        
+        status('');
+      }
+      if (!signal.aborted && !disposed) showSource(results);
+    } catch (error) { if (!signal.aborted && !disposed) status(error.message, true); }
   }
 function onClick(event) {
     const target = event.target;
@@ -119,7 +159,10 @@ function onClick(event) {
     const button = target.closest('button');
     if (!button || button.disabled) return;
     try {
-      
+      if (button.hasAttribute('data-retry-api')) {
+        clearApiCache();
+        render();
+      }
     } catch (error) {
       toast(error.message);
     }
