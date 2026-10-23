@@ -1,0 +1,12 @@
+/* Organização da página de favoritos. Cards e grades vêm de components.css. */
+.favorites-section {
+  margin-top: 28px;
+}
+.favorites-section > h2 {
+  margin-bottom: 18px;
+}
+@media (min-width: 700px) {
+  .favorites-section {
+    margin-top: 40px;
+  }
+}

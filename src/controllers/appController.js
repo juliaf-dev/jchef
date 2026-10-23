@@ -6,12 +6,14 @@ import restaurantDetails from '../pages/RestaurantDetails.html?raw';
 import users from '../pages/Users.html?raw';
 import userDetails from '../pages/UserDetails.html?raw';
 import foodDetails from '../pages/FoodDetails.html?raw';
+import favorites from '../pages/Favorites.html?raw';
 import { resolveRoute } from '../routers/routes.js';
 import { getCart } from '../utils/storage.js';
 import { getResource, clearApiCache } from '../utils/api.js';
 import { money, normalize } from '../utils/format.js';
 import { setImage, syncFavoriteButtons, deliveryLabel, renderFoods, renderRestaurants, renderUsers } from './cardsController.js';
-const pages = { home, notFound, foods, restaurants, restaurantDetails, users, userDetails, foodDetails };
+import { getFavorites, toggleFavorite } from '../utils/storage.js';
+const pages = { home, notFound, foods, restaurants, restaurantDetails, users, userDetails, foodDetails, favorites };
 const titles = {
   home: 'Sabor que chega até você',
   foods: 'Descubra comidas',
@@ -211,7 +213,21 @@ async function render() {
     const searchInput = find('input[name="q"]'); if (searchInput) searchInput.value = route.query || '';
     if (route.name === 'notFound') return;
     
-    
+    if (route.name === 'favorites') {
+      const saved = getFavorites();
+      showSource(saved);
+      const foodList = saved.filter((item) => item.resource === 'foods');
+      const restaurantList = saved.filter((item) => item.resource === 'restaurants');
+      find('[data-saved-foods]').hidden = !foodList.length;
+      find('[data-saved-restaurants]').hidden = !restaurantList.length;
+      renderFoods(root, find('[data-food-grid]'), foodList, items);
+      renderRestaurants(root, find('[data-restaurant-grid]'), restaurantList, items);
+      if (!saved.length)
+        status(
+          'Sua lista está esperando novos sabores. Toque no coração de uma comida ou restaurante para salvar.',
+        );
+      return;
+    }
     status('Carregando dados...');
     try {
       const results = [];
@@ -265,6 +281,13 @@ function onClick(event) {
       if (button.hasAttribute('data-retry-api')) {
         clearApiCache();
         render();
+      } else if (button.hasAttribute('data-favorite')) {
+        const item = items.get(button.dataset.favorite);
+        if (!item) return;
+        const saved = toggleFavorite(item);
+        if (resolveRoute(location).name === 'favorites') render();
+        else syncFavoriteButtons(root);
+        toast(saved ? 'Salvo nos seus favoritos.' : 'Removido dos favoritos.');
       } else if (button.hasAttribute('data-detail-quantity')) {
         detailCount = Math.max(
           1,
@@ -291,7 +314,7 @@ function onSubmit(event) {
 root.addEventListener('click', onClick, eventOptions);
 root.addEventListener('submit', onSubmit, eventOptions);
 window.addEventListener('popstate', render, eventOptions);
-
+window.addEventListener('storage', event => { if (!event.key || event.key.startsWith('jchef:')) render(); }, eventOptions);
 render();
 return () => { disposed = true; requestController?.abort(); events.abort(); clearTimeout(toastTimer); };
 }
