@@ -33,5 +33,5 @@ function resolveOriginalRoute(location) {
 
 export function resolveRoute(location) {
   const route = resolveOriginalRoute(location);
-  return ["home","notFound","foods","restaurants","restaurantDetails","users","userDetails","foodDetails","favorites"].includes(route.name) ? route : { name: 'notFound' };
+  return ["home","notFound","foods","restaurants","restaurantDetails","users","userDetails","foodDetails","favorites","cart"].includes(route.name) ? route : { name: 'notFound' };
 }

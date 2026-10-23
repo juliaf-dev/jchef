@@ -7,13 +7,15 @@ import users from '../pages/Users.html?raw';
 import userDetails from '../pages/UserDetails.html?raw';
 import foodDetails from '../pages/FoodDetails.html?raw';
 import favorites from '../pages/Favorites.html?raw';
+import cart from '../pages/Cart.html?raw';
 import { resolveRoute } from '../routers/routes.js';
 import { getCart } from '../utils/storage.js';
 import { getResource, clearApiCache } from '../utils/api.js';
 import { money, normalize } from '../utils/format.js';
 import { setImage, syncFavoriteButtons, deliveryLabel, renderFoods, renderRestaurants, renderUsers } from './cardsController.js';
 import { getFavorites, toggleFavorite } from '../utils/storage.js';
-const pages = { home, notFound, foods, restaurants, restaurantDetails, users, userDetails, foodDetails, favorites };
+import { addToCart, changeQuantity } from '../utils/storage.js';
+const pages = { home, notFound, foods, restaurants, restaurantDetails, users, userDetails, foodDetails, favorites, cart };
 const titles = {
   home: 'Sabor que chega até você',
   foods: 'Descubra comidas',
@@ -204,6 +206,44 @@ function categories(list, route) {
     }
     find('[data-category-value]').value = route.category;
   }
+
+function showCart() {
+    const saved = getCart();
+    showSource(saved);
+    if (!saved.length) {
+      status(
+        'Sua sacola está vazia. Explore as comidas e adicione seu primeiro favorito.',
+      );
+      return;
+    }
+    find('[data-cart-content]').hidden = false;
+    const box = find('[data-cart-items]');
+    saved.forEach((food) => {
+      items.set(`foods:${food.id}`, food);
+      const card = root.querySelector('#cart-item-template').content.cloneNode(true);
+      card.querySelectorAll('a').forEach((link) => (link.href = `/foods/${food.id}`));
+      setImage(card.querySelector('img'), food.image, food.name);
+      card.querySelector('[data-name-link]').textContent = food.name;
+      card.querySelector('[data-unit-price]').textContent =
+        `${money(food.price)} por unidade`;
+      card.querySelector('[data-quantity-value]').textContent = food.quantity;
+      card.querySelector('[data-line-total]').textContent = money(
+        food.price * food.quantity,
+      );
+      card.querySelectorAll('[data-quantity]').forEach((button) => {
+        button.dataset.itemId = food.id;
+        if (button.dataset.quantity === '1') button.disabled = food.quantity >= 99;
+      });
+      box.append(card);
+    });
+    find('[data-total-items]').textContent = saved.reduce(
+      (sum, food) => sum + food.quantity,
+      0,
+    );
+    find('[data-subtotal]').textContent = money(
+      saved.reduce((sum, food) => sum + food.price * food.quantity, 0),
+    );
+  }
 async function render() {
     requestController?.abort(); requestController = new AbortController();
     const { signal } = requestController;
@@ -212,7 +252,7 @@ async function render() {
     updateNavigation(); document.title = titles[route.name] + ' | JChef';
     const searchInput = find('input[name="q"]'); if (searchInput) searchInput.value = route.query || '';
     if (route.name === 'notFound') return;
-    
+    if (route.name === 'cart') { showCart(); return; }
     if (route.name === 'favorites') {
       const saved = getFavorites();
       showSource(saved);
@@ -281,6 +321,10 @@ function onClick(event) {
       if (button.hasAttribute('data-retry-api')) {
         clearApiCache();
         render();
+      } else if (button.hasAttribute('data-add')) {
+        addToCart(items.get(`foods:${button.dataset.add}`));
+        updateNavigation();
+        toast('Boa escolha! Comida adicionada à sacola.');
       } else if (button.hasAttribute('data-favorite')) {
         const item = items.get(button.dataset.favorite);
         if (!item) return;
@@ -288,12 +332,21 @@ function onClick(event) {
         if (resolveRoute(location).name === 'favorites') render();
         else syncFavoriteButtons(root);
         toast(saved ? 'Salvo nos seus favoritos.' : 'Removido dos favoritos.');
+      } else if (button.hasAttribute('data-quantity')) {
+        changeQuantity(Number(button.dataset.itemId), Number(button.dataset.quantity));
+        render();
       } else if (button.hasAttribute('data-detail-quantity')) {
         detailCount = Math.max(
           1,
           Math.min(99, detailCount + Number(button.dataset.detailQuantity)),
         );
         find('[data-detail-count]').textContent = detailCount;
+      } else if (button.hasAttribute('data-add-detail') && detailFood) {
+        addToCart(detailFood, detailCount);
+        updateNavigation();
+        toast(
+          `${detailCount} ${detailCount === 1 ? 'item adicionado' : 'itens adicionados'} à sacola.`,
+        );
       }
     } catch (error) {
       toast(error.message);

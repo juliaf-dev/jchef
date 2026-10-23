@@ -14,6 +14,7 @@ import './styles/restaurants.css';
 import './styles/restaurant-details.css';
 import './styles/users.css';
 import './styles/user-details.css';
+import './styles/cart.css';
 import './styles/favorites.css';
 import './styles/not-found.css';
 import App from './App.jsx';

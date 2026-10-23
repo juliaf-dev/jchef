@@ -1,0 +1,73 @@
+<!-- Sacola local: quantidades e subtotal. Finalização é só uma simulação explícita. -->
+<a
+  class="back-link"
+  href="/foods"
+  data-route
+>
+  ‹ Continuar escolhendo
+</a>
+<div class="page-heading">
+  <p class="eyebrow">BOAS ESCOLHAS POR AQUI</p>
+  <h1>Sua sacola</h1>
+  <p>Confira os itens antes de continuar.</p>
+</div>
+<div
+  data-status
+  role="status"
+  aria-live="polite"
+></div>
+<div
+  class="cart-layout"
+  data-cart-content
+  hidden
+>
+  <div data-cart-items></div>
+  <aside class="order-summary">
+    <h2>Resumo da sacola</h2>
+    <div class="summary-line">
+      <span>Quantidade de itens</span>
+      <strong data-total-items></strong>
+    </div>
+    <div class="summary-line summary-total">
+      <span>Subtotal</span>
+      <strong data-subtotal></strong>
+    </div>
+    <p>
+      Taxa de entrega não incluída. Este é um protótipo acadêmico, sem cobrança ou
+      entrega real.
+    </p>
+    <button hidden disabled
+      class="btn btn-danger"
+      type="button"
+      data-confirm-open
+    >
+      Simular pedido
+    </button>
+  </aside>
+</div>
+<dialog
+  class="checkout-dialog"
+  data-checkout-dialog
+>
+  <form method="dialog">
+    <button
+      class="dialog-close"
+      aria-label="Fechar"
+    >
+      ×
+    </button>
+  </form>
+  <p class="eyebrow">SÓ MAIS UMA CONFERIDA</p>
+  <h2>Confirmar simulação?</h2>
+  <p>
+    Os itens serão removidos da sua sacola. Nenhum pedido será enviado e nenhum valor
+    será cobrado.
+  </p>
+  <button
+    class="btn btn-danger"
+    type="button"
+    data-confirm-order
+  >
+    Confirmar simulação
+  </button>
+</dialog>
