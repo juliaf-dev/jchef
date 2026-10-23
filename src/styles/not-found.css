@@ -1,0 +1,18 @@
+/* Mensagem de URL inexistente com um caminho de volta à página inicial. */
+.not-found {
+  padding: 60px 0;
+  max-width: 550px;
+  margin: auto;
+  text-align: center;
+}
+.not-found h1 {
+  margin-bottom: 20px;
+}
+.not-found > p:not(.eyebrow) {
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.8;
+}
+.not-found .btn {
+  margin-top: 18px;
+}

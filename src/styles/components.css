@@ -1,0 +1,358 @@
+/*
+  Componentes compartilhados: busca, cards, mensagens e controles de quantidade.
+  A grade começa com duas colunas e cresce progressivamente em telas maiores.
+ */
+.eyebrow {
+  color: var(--red);
+  letter-spacing: 1.6px;
+  font-size: 9px;
+  font-weight: 750;
+  margin-bottom: 9px;
+}
+.back-link {
+  display: inline-block;
+  color: #85818b;
+  font-size: 12px;
+  margin: 0 0 25px;
+}
+.page-heading {
+  margin-bottom: 25px;
+}
+.page-heading h1 {
+  margin-bottom: 8px;
+}
+.page-heading > p:last-child {
+  color: var(--muted);
+  font-size: 13px;
+  margin-bottom: 0;
+}
+.search-box {
+  display: flex;
+  align-items: center;
+  min-height: 46px;
+  background: var(--soft);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+}
+.search-box button {
+  width: 43px;
+  min-height: 44px;
+  border: 0;
+  background: transparent;
+  color: #a09ba5;
+  font-size: 23px;
+  flex-shrink: 0;
+}
+.search-box input {
+  flex: 1;
+  width: 100%;
+  min-width: 0;
+  padding: 10px 10px 10px 0;
+  border: 0;
+  background: transparent;
+  font-size: 12px;
+  color: var(--ink);
+}
+.search-box input::placeholder {
+  color: #aaa5ad;
+}
+.page-search {
+  max-width: 620px;
+  margin-bottom: 22px;
+}
+.section-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 15px;
+  margin-bottom: 17px;
+}
+.section-heading h2 {
+  font-size: 18px;
+  margin-bottom: 0;
+}
+.section-heading .eyebrow {
+  display: none;
+}
+.section-heading > a {
+  font-size: 10px;
+  color: var(--red);
+  white-space: nowrap;
+}
+.food-grid,
+.restaurant-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px 12px;
+}
+.food-card,
+.restaurant-card {
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  overflow: hidden;
+  min-width: 0;
+  background: #fff;
+}
+.card-photo {
+  position: relative;
+  aspect-ratio: 1.4;
+  overflow: hidden;
+  background: var(--soft);
+}
+.photo-link {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+.card-photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.2s;
+}
+.photo-link:hover img {
+  transform: scale(1.035);
+}
+.favorite-button {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  z-index: 1;
+  width: 40px;
+  height: 40px;
+  border: 0;
+  border-radius: 50%;
+  background: #fffffff2;
+  color: #a79ca3;
+  font-size: 22px;
+  line-height: 1;
+  box-shadow: 0 2px 8px #0000000a;
+}
+.favorite-button.saved {
+  color: var(--red);
+}
+.card-body {
+  padding: 11px 10px;
+}
+.card-kicker {
+  color: #a39da7;
+  font-size: 8px;
+  margin: 0 0 5px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.card-body h3 {
+  font-size: 12px;
+  line-height: 1.4;
+  margin: 0 0 5px;
+}
+.card-description {
+  font-size: 10px;
+  color: #aaa3ae;
+  line-height: 1.5;
+  margin: 0 0 12px;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+  min-height: 30px;
+}
+.card-bottom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 5px;
+}
+.price {
+  color: var(--green);
+  font-size: 12px;
+  font-weight: 700;
+}
+.add-button {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
+  border: 0;
+  border-radius: 50%;
+  background: var(--red);
+  color: white;
+  font-size: 21px;
+  line-height: 1;
+}
+.add-button:hover {
+  background: var(--red-dark);
+}
+.restaurant-meta {
+  font-size: 10px;
+  color: #a39da7;
+  margin: 0 0 6px;
+}
+.restaurant-rating {
+  font-size: 9px;
+  color: var(--green);
+  margin: 0;
+}
+.restaurant-arrow {
+  display: none;
+}
+.result-count {
+  color: var(--muted);
+  font-size: 12px;
+  margin: 20px 0;
+}
+.status-box {
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 24px;
+  background: var(--soft);
+  margin: 18px 0 26px;
+  color: #847c88;
+  font-size: 13px;
+  line-height: 1.7;
+}
+.status-box p {
+  margin: 0;
+}
+.status-box button {
+  margin-top: 12px;
+}
+.demo-banner {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  border: 1px solid #f3dfb7;
+  border-radius: 9px;
+  background: #fffbf2;
+  color: #92713e;
+  padding: 12px 14px;
+  margin-top: 18px;
+  font-size: 11px;
+}
+.demo-banner strong {
+  font-weight: 700;
+  font-size: 11px;
+}
+.demo-banner p {
+  margin: 3px 0 0;
+  font-size: 10px;
+}
+.demo-banner button {
+  margin-left: auto;
+  flex-shrink: 0;
+  padding: 4px 0;
+  border: 0;
+  color: #956d2a;
+  font-size: 10px;
+  text-decoration: underline;
+  background: transparent;
+}
+.demo-dot {
+  width: 6px;
+  height: 6px;
+  margin-top: 5px;
+  border-radius: 50%;
+  background: #cda052;
+  flex-shrink: 0;
+}
+.toast-message {
+  position: fixed;
+  z-index: 60;
+  bottom: 95px;
+  left: 20px;
+  right: 20px;
+  max-width: 450px;
+  margin: auto;
+  background: #242328;
+  color: white;
+  border-radius: 12px;
+  padding: 15px 20px;
+  font-size: 13px;
+  box-shadow: 0 8px 30px #00000018;
+}
+.quantity-control {
+  display: inline-flex;
+  align-items: center;
+  gap: 18px;
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  padding: 3px;
+  background: #fff;
+}
+.quantity-control button {
+  width: 36px;
+  height: 36px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--red);
+  font-size: 20px;
+}
+.quantity-control span,
+.quantity-control output {
+  font-size: 14px;
+  min-width: 15px;
+  text-align: center;
+}
+.quantity-control button:hover {
+  background: #fff1f3;
+}
+@media (min-width: 700px) {
+  .food-grid,
+  .restaurant-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 22px;
+  }
+  .card-body {
+    padding: 14px;
+  }
+  .card-body h3 {
+    font-size: 14px;
+  }
+  .card-kicker {
+    font-size: 9px;
+  }
+  .card-description {
+    font-size: 11px;
+    min-height: 33px;
+  }
+  .price {
+    font-size: 14px;
+  }
+  .section-heading {
+    margin-bottom: 22px;
+  }
+  .section-heading h2 {
+    font-size: 21px;
+  }
+  .section-heading .eyebrow {
+    display: block;
+    font-size: 8px;
+    margin-bottom: 6px;
+  }
+  .section-heading > a {
+    font-size: 11px;
+  }
+  .toast-message {
+    bottom: 24px;
+  }
+  .demo-banner {
+    align-items: center;
+  }
+}
+@media (min-width: 1024px) {
+  .food-grid,
+  .restaurant-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition: none !important;
+    scroll-behavior: auto !important;
+  }
+}
