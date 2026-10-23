@@ -88,3 +88,15 @@ export function renderRestaurants(root, grid, restaurants, items) {
   });
   syncFavoriteButtons(root);
 }
+
+export function renderUsers(root, grid, users) {
+  grid.replaceChildren();
+  users.forEach((user) => {
+    const card = root.querySelector('#user-card-template').content.cloneNode(true);
+    card.querySelector('.avatar').textContent = user.name.slice(0, 1).toUpperCase();
+    card.querySelectorAll('a').forEach((link) => (link.href = `/users/${user.id}`));
+    card.querySelector('h3 a').textContent = user.name;
+    card.querySelector('p').textContent = user.address || user.email || 'Ver perfil';
+    grid.append(card);
+  });
+}

@@ -1,0 +1,49 @@
+/*
+  Estilos da página individual: user-details.
+  O controller preenche os dados; este arquivo cuida somente da apresentação.
+  O celular usa a base e min-width amplia o layout para telas maiores.
+ */
+
+.profile-card {
+  border: 1px solid var(--line);
+  background: #fff;
+  border-radius: 18px;
+  padding: 28px 24px;
+  max-width: 680px;
+  margin: 0 auto;
+}
+.avatar-large {
+  width: 76px;
+  height: 76px;
+  font-size: 30px;
+  margin-bottom: 24px;
+}
+.profile-note {
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.8;
+}
+.profile-fields {
+  margin: 28px 0;
+}
+.profile-fields > div {
+  padding: 16px 0;
+  border-bottom: 1px solid var(--line);
+}
+.profile-fields dt {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+.profile-fields dd {
+  font-size: 14px;
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+@media (min-width: 700px) {
+  .profile-card {
+    padding: 40px;
+  }
+}

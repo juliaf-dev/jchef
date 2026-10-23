@@ -1,0 +1,50 @@
+<!-- Tela de GET /users/:id. O controller preenche apenas campos fornecidos. -->
+<a
+  class="back-link"
+  href="/users"
+  data-route
+>
+  ‹ Voltar aos perfis
+</a>
+<div
+  data-status
+  role="status"
+  aria-live="polite"
+></div>
+<article
+  class="profile-card"
+  data-detail
+  hidden
+>
+  <span
+    class="avatar avatar-large"
+    data-user-avatar
+    aria-hidden="true"
+  ></span>
+  <p class="eyebrow">BEM-VINDO À MESA</p>
+  <h1 data-user-name></h1>
+  <p class="profile-note">
+    Perfil de demonstração da API. Nenhuma autenticação é realizada.
+  </p>
+  <dl class="profile-fields">
+    <div>
+      <dt>E-mail</dt>
+      <dd data-user-email></dd>
+    </div>
+    <div>
+      <dt>Telefone</dt>
+      <dd data-user-phone></dd>
+    </div>
+    <div>
+      <dt>Endereço</dt>
+      <dd data-user-address></dd>
+    </div>
+  </dl>
+  <a
+    class="btn btn-danger"
+    href="/foods"
+    data-route
+  >
+    Escolher algo gostoso ↗
+  </a>
+</article>

@@ -3,12 +3,14 @@ import notFound from '../pages/NotFound.html?raw';
 import foods from '../pages/Foods.html?raw';
 import restaurants from '../pages/Restaurants.html?raw';
 import restaurantDetails from '../pages/RestaurantDetails.html?raw';
+import users from '../pages/Users.html?raw';
+import userDetails from '../pages/UserDetails.html?raw';
 import { resolveRoute } from '../routers/routes.js';
 import { getCart } from '../utils/storage.js';
 import { getResource, clearApiCache } from '../utils/api.js';
 import { money, normalize } from '../utils/format.js';
-import { setImage, syncFavoriteButtons, deliveryLabel, renderFoods, renderRestaurants } from './cardsController.js';
-const pages = { home, notFound, foods, restaurants, restaurantDetails };
+import { setImage, syncFavoriteButtons, deliveryLabel, renderFoods, renderRestaurants, renderUsers } from './cardsController.js';
+const pages = { home, notFound, foods, restaurants, restaurantDetails, users, userDetails };
 const titles = {
   home: 'Sabor que chega até você',
   foods: 'Descubra comidas',
@@ -133,6 +135,27 @@ function showRestaurant(restaurant, allFoods) {
     renderFoods(root, find('[data-food-grid]'), related, items);
     syncFavoriteButtons(root);
   }
+
+function greet(user) {
+    const firstName = user.name.split(' ')[0];
+    root.querySelector('[data-greeting]').textContent = `Olá, ${firstName}`;
+    root.querySelector('[data-avatar]').textContent = firstName.slice(0, 1);
+    root.querySelector('[data-location]').textContent =
+      user.address || 'Endereço não informado';
+    if (find('[data-welcome]')) {
+      find('[data-welcome]').textContent = `O que vamos comer hoje, ${firstName}?`;
+    }
+  }
+
+function showUser(user) {
+    find('[data-detail]').hidden = false;
+    document.title = `${user.name} | JChef`;
+    find('[data-user-name]').textContent = user.name;
+    find('[data-user-avatar]').textContent = user.name.slice(0, 1).toUpperCase();
+    for (const field of ['email', 'phone', 'address']) {
+      find(`[data-user-${field}]`).textContent = user[field] || 'Não informado';
+    }
+  }
 async function render() {
     requestController?.abort(); requestController = new AbortController();
     const { signal } = requestController;
@@ -150,7 +173,7 @@ async function render() {
       if (route.name === 'home') {
         const foodList = await load('foods');
         const restaurantList = await load('restaurants');
-        
+        const userList = await load('users'); if (userList[0]) greet(userList[0]);
         if (signal.aborted || disposed) return;
         renderFoods(root, find('[data-food-grid]'), foodList.slice(0, 4), items);
         renderRestaurants(root, find('[data-restaurant-grid]'), restaurantList.slice(0, 4), items);
@@ -162,13 +185,13 @@ async function render() {
           
           renderFoods(root, find('[data-food-grid]'), filtered, items);
         } else if (route.name === 'restaurants') renderRestaurants(root, find('[data-restaurant-grid]'), filtered, items);
-        
+        else renderUsers(root, find('[data-user-grid]'), filtered);
         find('[data-result-count]').textContent = filtered.length + ' resultados encontrados';
         status(filtered.length ? '' : 'Nenhum resultado encontrado.');
       } else {
         const record = await load(route.resource, route.id); if (signal.aborted || disposed) return;
         if (route.name === 'restaurantDetails') { const foodList = await load('foods'); if (signal.aborted || disposed) return; showRestaurant(record, foodList); }
-        
+        else if (route.name === 'userDetails') showUser(record);
         
         status('');
       }

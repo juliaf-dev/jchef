@@ -1,0 +1,51 @@
+<!-- Tela de GET /users. Perfis da API fake, sem login ou alteração remota. -->
+<a
+  class="back-link"
+  href="/"
+  data-route
+>
+  ‹ Voltar ao início
+</a>
+<div class="page-heading">
+  <p class="eyebrow">QUEM ESTÁ COM FOME POR AQUI?</p>
+  <h1>Perfis</h1>
+  <p>Conheça os perfis disponibilizados pela API.</p>
+</div>
+<form hidden
+  class="search-box page-search"
+  role="search"
+  data-search="users"
+>
+  <button
+    type="submit"
+    aria-label="Buscar perfis"
+  >
+    ⌕
+  </button>
+  <label
+    class="visually-hidden"
+    for="users-query"
+  >
+    Nome do perfil
+  </label>
+  <input
+    id="users-query"
+    name="q"
+    type="search"
+    placeholder="Buscar pelo nome"
+    maxlength="120"
+  />
+</form>
+<p
+  class="result-count"
+  data-result-count
+></p>
+<div
+  data-status
+  role="status"
+  aria-live="polite"
+></div>
+<div
+  class="user-grid"
+  data-user-grid
+></div>
