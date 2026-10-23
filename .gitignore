@@ -1,0 +1,6 @@
+# Não enviar dependências, arquivos gerados ou configurações locais ao GitHub.
+node_modules/
+dist/
+.env
+.env.*
+*.log
